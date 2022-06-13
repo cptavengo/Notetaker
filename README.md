@@ -14,10 +14,10 @@ I wrote this code after observing several different people's methods while train
 
 __Currently this has only been tested for Windows 10 devices!__
 
-<li> When clear fields is selected before a file has been saved for the day, the app will crash. Need to setup a safeguard for this. </li>
-<li> Case name error has popped up incorrectly under certain circumstances; need to reproduce. </li>
-<li> Closing the program does not warn the user if the file has not been saved yet. </li>
-<li> When preview window is in focus, it blocks any additional popups from happening from clearing fields or saving the file. </li>
+<li> ~~When clear fields is selected before a file has been saved for the day, the app will crash. Need to setup a safeguard for this.~~ </li>
+<li> ~~Case name error has popped up incorrectly under certain circumstances; need to reproduce.~~ </li>
+<li> ~~Closing the program does not warn the user if the file has not been saved yet.~~ </li>
+<li> ~~When preview window is in focus, it blocks any additional popups from happening from clearing fields or saving the file.~~ </li>
 
 <a name="Wishlist"> </a>
 

@@ -19,12 +19,76 @@ def editWindow():
         [sg.Button("Save"), sg.Button("Preview"), sg.Button("Clear fields")]
     ]
 
-    editWindow = sg.Window(" ", editLayout)
+    editWindow = sg.Window(" ", editLayout, enable_close_attempted_event=True)
 
     while True:
         eventEdit, valuesEdit = editWindow.read()
-        if eventEdit == sg.WIN_CLOSED or eventEdit == "Exit":
-            break
+        if eventEdit == sg.WINDOW_CLOSE_ATTEMPTED_EVENT:
+            exitSave = sg.popup_yes_no("Save before exiting?", title=" ")
+            if exitSave == "Yes":
+                while inputFieldCheck(valuesEdit["-CxCase-"]) is True:
+                    exitSaveCase = sg.popup_get_text("Input case number here:", title=" ")
+                    valuesEdit["-CxCase-"] = exitSaveCase
+
+                cwd = os.getcwd()
+                if str(datetime.date.today().year) not in os.listdir():
+                    os.mkdir(str(datetime.date.today().year))
+                os.chdir(str(datetime.date.today().year))
+
+                if datetime.date.today().strftime("%B") not in os.listdir():
+                    os.mkdir(datetime.date.today().strftime("%B"))
+                os.chdir(datetime.date.today().strftime("%B"))
+
+                if str(datetime.date.today()) not in os.listdir():
+                    os.mkdir(str(datetime.date.today()))
+                os.chdir(str(datetime.date.today()))
+
+                if "{i}.txt".format(i=valuesEdit["-CxCase-"]) not in os.listdir():
+                    if inputFieldCheck(valuesEdit["-CxCase-"]) is False:
+                        file = open("{i}.txt".format(i=valuesEdit["-CxCase-"]), "w")
+                        file.write("Customer name: {i} \
+                        \nCustomer phone: {j} \nCustomer email: {k} \
+                        \nCase number: {l}\n__________________________________________________\
+                        \nProblem Description:\
+                        \n{m}__________________________________________________\
+                        \nActions Taken:\
+                        \n{n}__________________________________________________\
+                        \nNext Steps:\
+                        \n{o}__________________________________________________"\
+                        .format(i=valuesEdit["-CxName-"], j=valuesEdit["-CxPhone-"],
+                        k=valuesEdit["-CxEmail-"], l=valuesEdit["-CxCase-"],
+                        m=valuesEdit["-CxProblem-"], n=valuesEdit["-Actions-"],
+                        o=valuesEdit["-Steps-"]))
+                        file.close()
+                        sg.Popup("File saved", title=" ")
+
+                    elif "{i}.txt".format(i=valuesEdit["-CxCase-"]) in os.listdir():
+                        fileSaveYesNo = sg.popup_yes_no("File already exists, confirm rewrite?", title="")
+                        if fileSaveYesNo == "Yes":
+                            file = open("{i}.txt".format(i=valuesEdit["-CxCase-"]), "w+")
+                            file.write("Customer name: {i} \
+                            \nCustomer phone: {j} \nCustomer email: {k} \
+                            \nCase number: {l}\n__________________________________________________\
+                            \nProblem Description:\
+                            \n{m}__________________________________________________\
+                            \nActions Taken:\
+                            \n{n}__________________________________________________\
+                            \nNext Steps:\
+                            \n{o}__________________________________________________"\
+                            .format(i=valuesEdit["-CxName-"], j=valuesEdit["-CxPhone-"],
+                            k=valuesEdit["-CxEmail-"], l=valuesEdit["-CxCase-"],
+                            m=valuesEdit["-CxProblem-"], n=valuesEdit["-Actions-"],
+                            o=valuesEdit["-Steps-"]))
+                            file.close()
+                            sg.Popup("File saved", title=" ")
+
+                        elif fileSaveYesNo == "No":
+                            fileSaveYesNo = sg.WIN_CLOSED
+                        os.chdir(cwd)
+                break
+
+            else:   
+                break
 
         if eventEdit == "Save":
             cwd = os.getcwd()
@@ -90,7 +154,23 @@ def editWindow():
 
         if eventEdit == "Clear fields":
             cwd = os.getcwd()
-            os.chdir(str(datetime.date.today().year)+"/"+datetime.date.today().strftime("%B")+"/"+str(datetime.date.today()))
+
+            if os.path.exists(str(datetime.date.today().year)+"/"+datetime.date.today().strftime("%B")+"/"+str(datetime.date.today())):
+                os.chdir(str(datetime.date.today().year)+"/"+datetime.date.today().strftime("%B")+"/"+str(datetime.date.today()))
+
+            else:
+                if str(datetime.date.today().year) not in os.listdir():
+                    os.mkdir(str(datetime.date.today().year))
+                os.chdir(str(datetime.date.today().year))
+
+                if datetime.date.today().strftime("%B") not in os.listdir():
+                    os.mkdir(datetime.date.today().strftime("%B"))
+                os.chdir(datetime.date.today().strftime("%B"))
+
+                if str(datetime.date.today()) not in os.listdir():
+                    os.mkdir(str(datetime.date.today()))
+                os.chdir(str(datetime.date.today()))
+
             if str(valuesEdit["-CxCase-"])+".txt" not in os.listdir():
                 answer = sg.popup_yes_no("Confirm clear fields without saving:", title="")
                 if answer == "Yes":
@@ -133,7 +213,7 @@ def previewWindow(name, phone, email, case, problem, actions, next):
     o=next), size=(50,40))]
     ]
 
-    previewWindow = sg.Window(" ", previewLayout)
+    previewWindow = sg.Window(" ", previewLayout, modal=True)
 
     while True:
         previewEdit, previewEdit = previewWindow.read()
@@ -142,7 +222,18 @@ def previewWindow(name, phone, email, case, problem, actions, next):
 
 def inputFieldCheck(inputField):
     if inputField.isnumeric() is False or len(inputField) != 8:
-        sg.Popup("Case number can only be numeric", title=" ")
+        if inputField.isspace() is True or inputField == "":
+            sg.Popup("Case number is empty", title=" ")
+
+        elif len(inputField) > 8:
+            sg.Popup("Case number larger than 8 numbers", title=" ")
+
+        elif len(inputField) < 8:
+            sg.Popup("Case number less than 8 numbers", title=" ")
+        
+        else:
+            sg.Popup("Case number must be numeric", title=" ")
+
         return True
     return False
 
